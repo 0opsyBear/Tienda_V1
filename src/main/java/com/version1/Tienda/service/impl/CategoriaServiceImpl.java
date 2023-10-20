@@ -7,21 +7,39 @@ import com.version1.Tienda.service.CategoriaService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-
-//Esta clase se trae la informacion de CategoriaService (TablaService) para hacer modificaciones de la capa de datos
-//La progra con la info fuera del CRUD
 @Service
-public class CategoriaServiceImpl implements CategoriaService{
-    
-    @Autowired //Crea un unico objeto mientras se ejecuta la aplicacion 
+public class CategoriaServiceImpl implements CategoriaService {
+
+    @Autowired
     private CategoriaDao categoriaDao;
-    public List<Categoria> getCategorias(boolean activos){
-        var lista=categoriaDao.findAll(); //encontrar todos los datos que tenga la lista
-        
-        if(activos){
-            lista.removeIf(e->!e.isActivo()); //permite sabe si el objeto esta activo 
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Categoria> getCategorias(boolean activos) {
+        var lista = categoriaDao.findAll();
+        if (activos) {
+            lista.removeIf(e -> !e.isActivo());
         }
         return lista;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Categoria getCategoria(Categoria categoria) {
+        return categoriaDao.findById(categoria.getIdCategoria()).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public void save(Categoria categoria) {
+        categoriaDao.save(categoria);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Categoria categoria) {
+        categoriaDao.delete(categoria);
     }
 }
